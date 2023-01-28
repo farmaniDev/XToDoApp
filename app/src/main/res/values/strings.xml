@@ -14,6 +14,8 @@
     <string name="add">Add</string>
     <string name="save">Save</string>
     <string name="delete">Delete</string>
+    <string name="note_saved_message">Note Saved!</string>
+    <string name="note_saved_failed">Please fill out all fields!</string>
 
     <string-array name="priorities">
         <item>High Priority</item>
