@@ -1,34 +1,39 @@
 package com.farmani.xtodo.fragments.add
 
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.*
 import android.widget.Toast
 import androidx.core.view.MenuHost
-import androidx.fragment.app.Fragment
 import androidx.core.view.MenuProvider
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import com.farmani.xtodo.R
-import com.farmani.xtodo.data.models.Priority
 import com.farmani.xtodo.data.models.ToDoData
 import com.farmani.xtodo.data.viewmodel.ToDoViewModel
-import kotlinx.android.synthetic.main.fragment_add.*
+import com.farmani.xtodo.databinding.FragmentAddBinding
+import com.farmani.xtodo.fragments.SharedViewModel
 
 class AddFragment : Fragment(), MenuProvider {
 
     private val mToDoViewModel: ToDoViewModel by viewModels()
+    private val mSharedViewModel: SharedViewModel by viewModels()
+    private var _binding: FragmentAddBinding? = null
+    private val binding get() = _binding!!
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
-        // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_add, container, false)
+        _binding = FragmentAddBinding.inflate(inflater, container, false)
+        val view = binding.root
         return view
+        // Inflate the layout for this fragment
+//        val view = inflater.inflate(R.layout.fragment_add, container, false)
+//        return view
     }
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -43,16 +48,16 @@ class AddFragment : Fragment(), MenuProvider {
     }
 
     private fun insertDataToDb() {
-        val mTitle = title_editText.text.toString()
-        val mPriority = priorities_spinner.selectedItem.toString()
-        val mDescription = description_editText.text.toString()
+        val mTitle = binding.titleEditText.text.toString()
+        val mPriority = binding.prioritiesSpinner.selectedItem.toString()
+        val mDescription = binding.descriptionEditText.text.toString()
 
-        val validation = verifyDataFromUser(mTitle, mDescription)
+        val validation = mSharedViewModel.verifyDataFromUser(mTitle, mDescription)
         if (validation) {
             val newData = ToDoData(
                 0,
                 mTitle,
-                parsePriority(mPriority),
+                mSharedViewModel.parsePriority(mPriority),
                 mDescription
             )
             mToDoViewModel.insertData(newData)
@@ -64,25 +69,9 @@ class AddFragment : Fragment(), MenuProvider {
         }
     }
 
-    private fun verifyDataFromUser(title: String, description: String): Boolean {
-        return if (TextUtils.isEmpty(title) || TextUtils.isEmpty(description)) {
-            false
-        } else !(title.isEmpty() || description.isEmpty())
-    }
-
-    private fun parsePriority(priority: String): Priority {
-        return when (priority) {
-            "High Priority" -> {
-                Priority.HIGH
-            }
-            "Medium Priority" -> {
-                Priority.MEDIUM
-            }
-            "Low Priority" -> {
-                Priority.LOW
-            }
-            else -> Priority.LOW
-        }
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 
 }

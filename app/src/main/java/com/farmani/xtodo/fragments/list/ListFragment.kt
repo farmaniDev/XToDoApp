@@ -8,17 +8,20 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import com.farmani.xtodo.R
-import kotlinx.android.synthetic.main.fragment_list.view.*
+import com.farmani.xtodo.databinding.FragmentListBinding
 
 
 class ListFragment : Fragment(), MenuProvider {
+    private var _binding: FragmentListBinding? = null
+    private val binding get() = _binding!!
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
-        val view: View = inflater.inflate(R.layout.fragment_list, container, false)
-        view.fab_add.setOnClickListener {
+        _binding = FragmentListBinding.inflate(inflater, container, false)
+        val view = binding.root
+        binding.fabAdd.setOnClickListener {
             findNavController().navigate(R.id.action_listFragment_to_addFragment)
         }
 
