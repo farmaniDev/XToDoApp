@@ -29,11 +29,8 @@ class AddFragment : Fragment(), MenuProvider {
         menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
         _binding = FragmentAddBinding.inflate(inflater, container, false)
-        val view = binding.root
-        return view
-        // Inflate the layout for this fragment
-//        val view = inflater.inflate(R.layout.fragment_add, container, false)
-//        return view
+        binding.prioritiesSpinner.onItemSelectedListener = mSharedViewModel.listener
+        return binding.root
     }
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
