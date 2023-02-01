@@ -5,20 +5,34 @@ import android.view.*
 import androidx.core.view.MenuHost
 import androidx.fragment.app.Fragment
 import androidx.core.view.MenuProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.navigation.fragment.navArgs
 import com.farmani.xtodo.R
+import com.farmani.xtodo.data.models.Priority
+import com.farmani.xtodo.databinding.FragmentAddBinding
+import com.farmani.xtodo.databinding.FragmentUpdateBinding
+import com.farmani.xtodo.fragments.SharedViewModel
 
 class UpdateFragment : Fragment(), MenuProvider {
-
+    private val args by navArgs<UpdateFragmentArgs>()
+    private var _binding: FragmentUpdateBinding? = null
+    private val binding get() = _binding!!
+    private val mSharedViewModel: SharedViewModel by viewModels()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_update, container, false)
+        _binding = FragmentUpdateBinding.inflate(inflater, container, false)
+        binding.titleEditTextUpdate.setText(args.currentItem.title)
+        binding.descriptionEditTextUpdate.setText(args.currentItem.description)
+        binding.prioritiesSpinnerUpdate.setSelection(parsePriority(args.currentItem.priority))
+        binding.prioritiesSpinnerUpdate.onItemSelectedListener = mSharedViewModel.listener
+        return binding.root
     }
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -27,5 +41,13 @@ class UpdateFragment : Fragment(), MenuProvider {
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         return false
+    }
+
+    private fun parsePriority(priority: Priority): Int {
+        return when (priority) {
+            Priority.HIGH -> 0
+            Priority.MEDIUM -> 1
+            Priority.LOW -> 2
+        }
     }
 }
