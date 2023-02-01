@@ -2,6 +2,8 @@ package com.farmani.xtodo.fragments.list
 
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -21,6 +23,7 @@ class ListFragment : Fragment(), MenuProvider {
     private val binding get() = _binding!!
 
     private val mToDoAdapter: ToDoViewModel by viewModels()
+    private val mToDoViewModel: ToDoViewModel by viewModels()
     private val adapter: ListAdapter by lazy { ListAdapter() }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,6 +54,25 @@ class ListFragment : Fragment(), MenuProvider {
     }
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        if (menuItem.itemId == R.id.menu_deleteAll) {
+            confirmRemoval()
+        }
         return false
+    }
+
+    private fun confirmRemoval() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setPositiveButton("Yes") { _, _ ->
+            mToDoViewModel.deleteAll()
+            Toast.makeText(
+                requireContext(),
+                R.string.all_note_deleted_message,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+        builder.setNegativeButton("No") { _, _ -> }
+        builder.setTitle("Delete All Notes")
+        builder.setMessage("Are you sure you want to delete all notes?")
+        builder.create().show()
     }
 }
