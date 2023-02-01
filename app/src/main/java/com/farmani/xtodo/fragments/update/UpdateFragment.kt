@@ -3,6 +3,7 @@ package com.farmani.xtodo.fragments.update
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.MenuHost
 import androidx.fragment.app.Fragment
 import androidx.core.view.MenuProvider
@@ -45,8 +46,9 @@ class UpdateFragment : Fragment(), MenuProvider {
     }
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-        if (menuItem.itemId == R.id.menu_save) {
-            updateItem()
+        when (menuItem.itemId) {
+            R.id.menu_save -> updateItem()
+            R.id.menu_delete -> confirmItemRemoval()
         }
         return false
     }
@@ -66,11 +68,29 @@ class UpdateFragment : Fragment(), MenuProvider {
                 description
             )
             mToDoViewModel.updateData(updateItem)
-            Toast.makeText(requireContext(), R.string.note_updated_message, Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.note_updated_message, Toast.LENGTH_SHORT)
+                .show()
             findNavController().navigate(R.id.action_updateFragment_to_listFragment)
         } else {
             Toast.makeText(requireContext(), R.string.note_saved_failed, Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun confirmItemRemoval() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setPositiveButton("Yes") { _, _ ->
+            mToDoViewModel.deleteItem(args.currentItem)
+            Toast.makeText(
+                requireContext(),
+                "Successfully deleted ${args.currentItem.title}",
+                Toast.LENGTH_SHORT
+            ).show()
+            findNavController().navigate(R.id.action_updateFragment_to_listFragment)
+        }
+        builder.setNegativeButton("No") { _, _ -> }
+        builder.setTitle("Delete ${args.currentItem.title}")
+        builder.setMessage("Are you sure you want to delete \"${args.currentItem.title}\"?")
+        builder.create().show()
     }
 
 }
