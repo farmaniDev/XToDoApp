@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.farmani.xtodo.R
 import com.farmani.xtodo.data.viewmodel.ToDoViewModel
 import com.farmani.xtodo.databinding.FragmentListBinding
+import com.farmani.xtodo.fragments.SharedViewModel
 
 
 class ListFragment : Fragment(), MenuProvider {
@@ -24,6 +25,7 @@ class ListFragment : Fragment(), MenuProvider {
 
     private val mToDoAdapter: ToDoViewModel by viewModels()
     private val mToDoViewModel: ToDoViewModel by viewModels()
+    private val mSharedViewModel: SharedViewModel by viewModels()
     private val adapter: ListAdapter by lazy { ListAdapter() }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,22 +33,28 @@ class ListFragment : Fragment(), MenuProvider {
     ): View {
         // Inflate the layout for this fragment
         _binding = FragmentListBinding.inflate(inflater, container, false)
+        binding.lifecycleOwner = this
+        binding.mSharedViewModel = mSharedViewModel
         val view = binding.root
 
-        val recyclerView = binding.recyclerView
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(requireActivity())
+        // Set up RecyclerView
+        setUpRecyclerView()
+
+        // Observe LiveData
         mToDoAdapter.getAllData.observe(viewLifecycleOwner, Observer { data ->
+            mSharedViewModel.checkIfDatabaseIsEmpty(data)
             adapter.setData(data)
         })
-
-        binding.fabAdd.setOnClickListener {
-            findNavController().navigate(R.id.action_listFragment_to_addFragment)
-        }
 
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
         return view
+    }
+
+    private fun setUpRecyclerView() {
+        val recyclerView = binding.recyclerView
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(requireActivity())
     }
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -74,5 +82,10 @@ class ListFragment : Fragment(), MenuProvider {
         builder.setTitle("Delete All Notes")
         builder.setMessage("Are you sure you want to delete all notes?")
         builder.create().show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
