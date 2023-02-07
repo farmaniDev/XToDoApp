@@ -34,9 +34,9 @@ class UpdateFragment : Fragment(), MenuProvider {
         menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
         // Inflate the layout for this fragment
         _binding = FragmentUpdateBinding.inflate(inflater, container, false)
-        binding.titleEditTextUpdate.setText(args.currentItem.title)
-        binding.descriptionEditTextUpdate.setText(args.currentItem.description)
-        binding.prioritiesSpinnerUpdate.setSelection(mSharedViewModel.parsePriorityToInt(args.currentItem.priority))
+        binding.args = args
+
+        // Spinner Item Selected
         binding.prioritiesSpinnerUpdate.onItemSelectedListener = mSharedViewModel.listener
         return binding.root
     }
@@ -91,6 +91,11 @@ class UpdateFragment : Fragment(), MenuProvider {
         builder.setTitle("Delete ${args.currentItem.title}")
         builder.setMessage("Are you sure you want to delete \"${args.currentItem.title}\"?")
         builder.create().show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 }
