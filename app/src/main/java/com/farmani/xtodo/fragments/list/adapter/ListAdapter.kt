@@ -1,17 +1,13 @@
-package com.farmani.xtodo.fragments.list
+package com.farmani.xtodo.fragments.list.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
-import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import com.farmani.xtodo.R
-import com.farmani.xtodo.data.models.Priority
 import com.farmani.xtodo.data.models.ToDoData
 import com.farmani.xtodo.databinding.RowMainBinding
 
 class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
-    private var dataList = emptyList<ToDoData>()
+    var dataList = emptyList<ToDoData>()
 
     class MyViewHolder(private val binding: RowMainBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(toDoData: ToDoData) {
