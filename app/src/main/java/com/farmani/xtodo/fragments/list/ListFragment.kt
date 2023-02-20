@@ -14,10 +14,12 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.farmani.xtodo.R
+import com.farmani.xtodo.data.models.ToDoData
 import com.farmani.xtodo.data.viewmodel.ToDoViewModel
 import com.farmani.xtodo.databinding.FragmentListBinding
 import com.farmani.xtodo.fragments.SharedViewModel
 import com.farmani.xtodo.fragments.list.adapter.ListAdapter
+import com.google.android.material.snackbar.Snackbar
 
 
 class ListFragment : Fragment(), MenuProvider {
@@ -63,17 +65,29 @@ class ListFragment : Fragment(), MenuProvider {
     private fun swipeToDelete(recyclerView: RecyclerView) {
         val swipeToDeleteCallback = object : SwipeToDelete() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val itemToDelete = adapter.dataList[viewHolder.adapterPosition]
-                mToDoViewModel.deleteItem(itemToDelete)
-                Toast.makeText(
-                    requireContext(),
-                    "'${itemToDelete.title}' is successfully removed",
-                    Toast.LENGTH_SHORT
-                ).show()
+                val deletedItem = adapter.dataList[viewHolder.adapterPosition]
+                // Delete Item
+                mToDoViewModel.deleteItem(deletedItem)
+                adapter.notifyItemRemoved(viewHolder.adapterPosition)
+                // Restore Deleted Item
+                restoreDeletedData(viewHolder.itemView, deletedItem, viewHolder.adapterPosition)
             }
         }
         val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
         itemTouchHelper.attachToRecyclerView(recyclerView)
+    }
+
+    private fun restoreDeletedData(view: View, deletedItem: ToDoData, position: Int) {
+        val snackBar = Snackbar.make(
+            view,
+            "Deleted '${deletedItem.title}'",
+            Snackbar.LENGTH_LONG
+        )
+        snackBar.setAction("Undo") {
+            mToDoViewModel.insertData(deletedItem)
+            adapter.notifyItemChanged(position)
+        }
+        snackBar.show()
     }
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
