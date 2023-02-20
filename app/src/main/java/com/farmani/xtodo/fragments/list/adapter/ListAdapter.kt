@@ -2,6 +2,7 @@ package com.farmani.xtodo.fragments.list.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.farmani.xtodo.data.models.ToDoData
 import com.farmani.xtodo.databinding.RowMainBinding
@@ -9,7 +10,8 @@ import com.farmani.xtodo.databinding.RowMainBinding
 class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
     var dataList = emptyList<ToDoData>()
 
-    class MyViewHolder(private val binding: RowMainBinding) : RecyclerView.ViewHolder(binding.root) {
+    class MyViewHolder(private val binding: RowMainBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         fun bind(toDoData: ToDoData) {
             binding.toDoData = toDoData
             binding.executePendingBindings()
@@ -41,7 +43,9 @@ class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
     }
 
     fun setData(toDoData: List<ToDoData>) {
+        val toDoDiffUtil = ToDoDiffUtil(dataList, toDoData)
+        val toDoDiffRes = DiffUtil.calculateDiff(toDoDiffUtil)
         this.dataList = toDoData
-        notifyDataSetChanged()
+        toDoDiffRes.dispatchUpdatesTo(this)
     }
 }
