@@ -90,4 +90,6 @@ dependencies {
     // optional - Paging 3 Integration
     implementation("androidx.room:room-paging:$room_version")
 
+    implementation 'jp.wasabeef:recyclerview-animators:4.0.2'
+
 }
